@@ -1,7 +1,7 @@
 package telran.java52.security.filter;
 
 import java.io.IOException;
-import java.security.Principal;
+import java.util.Set;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import telran.java52.accounting.dao.UserAccountRepository;
-import telran.java52.accounting.model.Role;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
@@ -32,10 +32,9 @@ public class AdminManagingRolesFilter implements Filter {
 		HttpServletResponse response =(HttpServletResponse)resp;
 		if (checkEndPoint(request.getMethod(),request.getServletPath())) {
 			try {
-				Principal principal = request.getUserPrincipal();
-				String login =principal.getName();
-				if (!(userAccountRepository.findById(login)
-						.orElseThrow(RuntimeException::new).getRoles().contains(Role.ADMINISTRATOR))) {
+				User principal = (User) request.getUserPrincipal();
+				Set <String> roles = principal.getRoles();
+				if (!(roles.contains("ADMINISTRATOR"))) {
 					throw new RuntimeException();
 				}}
 			   catch (Exception e) {

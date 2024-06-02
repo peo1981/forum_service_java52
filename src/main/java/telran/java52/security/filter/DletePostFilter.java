@@ -1,6 +1,7 @@
 package telran.java52.security.filter;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -15,8 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import telran.java52.accounting.dao.UserAccountRepository;
-import telran.java52.accounting.model.Role;
 import telran.java52.post.dao.PostRepository;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
@@ -46,8 +47,9 @@ public class DletePostFilter implements Filter {
 				e.printStackTrace();
 				return;
 			}
-			boolean moderator = userAccountRepository.findById(request.getUserPrincipal().getName())
-					.orElseThrow(RuntimeException::new).getRoles().contains(Role.MODERATOR);
+			User principal = (User) request.getUserPrincipal();
+			Set <String> roles = principal.getRoles();
+			boolean moderator = roles.contains("MODERATOR");
 			if(!author.equalsIgnoreCase(request.getUserPrincipal().getName())&&!moderator) {
 				response.sendError(403,"You dont have access to this post!!");
 				System.out.println("================\"DeletePost_Filter_  You dont have access to delete this post!!\"====================================");

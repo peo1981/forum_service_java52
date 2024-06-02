@@ -1,7 +1,7 @@
 package telran.java52.security.filter;
 
 import java.io.IOException;
-import java.security.Principal;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.springframework.core.annotation.Order;
@@ -16,15 +16,14 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.java52.accounting.dao.UserAccountRepository;
-import telran.java52.accounting.model.Role;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
 @Order(30)
 public class UserUpdateDeleteFilter implements Filter {
 	
-	final UserAccountRepository userAccountRepository;
+	//final UserAccountRepository userAccountRepository;
 	
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -35,10 +34,10 @@ public class UserUpdateDeleteFilter implements Filter {
 		
 		if (checkEndPoint(method,request.getServletPath())) {
 			try {
-				Principal principal = request.getUserPrincipal();
+				User principal = (User) request.getUserPrincipal();
+				Set <String> roles = principal.getRoles();
 				String login =principal.getName();
-				boolean admin = userAccountRepository.findById(login)
-						.orElseThrow(RuntimeException::new).getRoles().contains(Role.ADMINISTRATOR);
+				boolean admin = roles.contains("ADMINISTRATOR");
 				boolean delete =HttpMethod.DELETE.matches(method);
 				boolean owner =request.getServletPath().matches("/account/user/" + Pattern.quote(login));
 				if (
