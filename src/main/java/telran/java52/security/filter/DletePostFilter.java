@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import telran.java52.accounting.dao.UserAccountRepository;
+import telran.java52.accounting.model.Role;
 import telran.java52.post.dao.PostRepository;
 import telran.java52.security.model.User;
 
@@ -49,7 +50,7 @@ public class DletePostFilter implements Filter {
 			}
 			User principal = (User) request.getUserPrincipal();
 			Set <String> roles = principal.getRoles();
-			boolean moderator = roles.contains("MODERATOR");
+			boolean moderator = roles.contains(Role.MODERATOR.name());
 			if(!author.equalsIgnoreCase(request.getUserPrincipal().getName())&&!moderator) {
 				response.sendError(403,"You dont have access to this post!!");
 				System.out.println("================\"DeletePost_Filter_  You dont have access to delete this post!!\"====================================");
